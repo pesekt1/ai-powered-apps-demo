@@ -1,5 +1,9 @@
 import axios from 'axios';
 
+const api = axios.create({
+   baseURL: 'http://localhost:3000',
+});
+
 export type Review = {
    id: number;
    author: string;
@@ -18,17 +22,17 @@ export type SummarizeResponse = {
 };
 
 export const reviewsApi = {
-   fetchReviews(productId: number) {
-      return axios
-         .get<GetReviewsResponse>(`/api/products/${productId}/reviews`)
-         .then((res) => res.data);
+   async fetchReviews(productId: number) {
+      const res = await api.get<GetReviewsResponse>(
+         `/api/products/${productId}/reviews`
+      );
+      return res.data;
    },
 
-   summarizeReviews(productId: number) {
-      return axios
-         .post<SummarizeResponse>(
-            `/api/products/${productId}/reviews/summarize`
-         )
-         .then((res) => res.data);
+   async summarizeReviews(productId: number) {
+      const res = await api.post<SummarizeResponse>(
+         `/api/products/${productId}/reviews/summarize`
+      );
+      return res.data;
    },
 };
