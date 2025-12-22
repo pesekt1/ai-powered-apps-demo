@@ -10,6 +10,17 @@ const prisma = new PrismaClient();
  */
 export const productRepository = {
    /**
+    * Fetch all products.
+    *
+    * @returns Array of products.
+    */
+   getProducts() {
+      return prisma.product.findMany({
+         orderBy: { id: 'asc' },
+      });
+   },
+
+   /**
     * Fetch a single product by its unique numeric identifier.
     *
     * @param productId - Product primary key.
