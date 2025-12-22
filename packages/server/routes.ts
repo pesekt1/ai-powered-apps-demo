@@ -9,10 +9,6 @@ router.get('/', (req: Request, res: Response) => {
    res.send('Hello World!');
 });
 
-router.get('/api/hello', (req: Request, res: Response) => {
-   res.json({ message: 'Hello World!' });
-});
-
 router.post('/api/chat', chatController.sendMessage);
 
 router.get('/api/products/:id/reviews', reviewController.getReviews);
