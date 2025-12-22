@@ -44,7 +44,9 @@ export const reviewController = {
    },
 
    /**
-    * POST/GET (depending on routing) handler: generate (or reuse) a summary for reviews.
+    * POST handler: generate (or reuse) a summary for reviews.
+    *
+    * Note: This is only a GET handler if you explicitly wire it as GET in routes.
     *
     * Guardrails:
     * - Validates product existence.

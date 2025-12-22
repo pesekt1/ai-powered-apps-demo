@@ -12,6 +12,8 @@ router.get('/', (req: Request, res: Response) => {
 router.post('/api/chat', chatController.sendMessage);
 
 router.get('/api/products/:id/reviews', reviewController.getReviews);
+
+// Summarization can create/persist a new summary, so it's intentionally POST-only.
 router.post(
    '/api/products/:id/reviews/summarize',
    reviewController.summarizeReviews
