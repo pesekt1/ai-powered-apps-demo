@@ -1,5 +1,5 @@
 import { llmClient } from '../llm/client';
-import template from '../llm/prompts/summarize-reviews.txt';
+import templatePrompt from '../llm/prompts/summarize-reviews.txt';
 import { reviewRepository } from '../repositories/review.repository';
 
 /**
@@ -21,7 +21,7 @@ export const reviewService = {
     * @returns Summary text.
     */
    async summarizeReviews(productId: number): Promise<string> {
-      // Cache-first: avoid calling the LLM if we already have a fresh summary.
+      // Cache-first: avoid calling the LLM if we already have a fresh summary in the database.
       const existingSummary =
          await reviewRepository.getReviewSummary(productId);
       if (existingSummary) {
@@ -32,9 +32,10 @@ export const reviewService = {
       const reviews = await reviewRepository.getReviews(productId, 10);
       const joinedReviews = reviews.map((r) => r.content).join('\n\n');
 
-      // Prompt templating keeps prompt text centralized and versionable.
-      const prompt = template.replace('{{reviews}}', joinedReviews);
+      // Add the reviews string into the prompt template.
+      const prompt = templatePrompt.replace('{{reviews}}', joinedReviews);
 
+      // Call the LLM to generate a new summary.
       const { text: summary } = await llmClient.generateText({
          model: 'gpt-4.1',
          prompt: prompt,
@@ -44,7 +45,7 @@ export const reviewService = {
          maxTokens: 500,
       });
 
-      // Persist the generated summary so subsequent requests don’t re-call the LLM.
+      // Persist the generated summary in the database, so subsequent requests don’t re-call the LLM.
       await reviewRepository.storeReviewSummary(productId, summary);
 
       return summary;

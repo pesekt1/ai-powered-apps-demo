@@ -68,7 +68,7 @@ export const reviewController = {
          return;
       }
 
-      // Guardrail: don't call the LLM if there's nothing to summarize.
+      // Don't call the LLM if there's nothing to summarize.
       const reviews = await reviewRepository.getReviews(productId, 1);
       if (!reviews.length) {
          res.status(400).json({ error: 'There are no reviews to summarize.' });
