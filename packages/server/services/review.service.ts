@@ -37,7 +37,7 @@ export const reviewService = {
 
       const { text: summary } = await llmClient.generateText({
          model: 'gpt-4.1',
-         prompt,
+         prompt: prompt,
          // Lower temperature for more stable, less “creative” summaries.
          temperature: 0.2,
          // Hard cap to prevent unexpectedly large responses.
