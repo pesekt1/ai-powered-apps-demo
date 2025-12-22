@@ -3,12 +3,17 @@ import { Ollama } from 'ollama';
 import OpenAI from 'openai';
 import summarizePrompt from '../llm/prompts/summarize-reviews.txt';
 
+// OpenAI client used for the main "generateText" path (Responses API).
+// Requires OPENAI_API_KEY in the environment.
 const openAIClient = new OpenAI({
    apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Hugging Face inference client (kept for alternative/back-up models or experiments).
+// NOTE: currently unused in this module.
 const inferenceClient = new InferenceClient(process.env.HF_TOKEN);
 
+// Ollama client used for local/offline model calls (e.g., quick summaries).
 const ollamaClient = new Ollama();
 
 type GenerateTextOptions = {
@@ -17,6 +22,11 @@ type GenerateTextOptions = {
    instructions?: string;
    temperature?: number;
    maxTokens?: number;
+   /**
+    * Provider-specific conversation continuation token.
+    * For OpenAI Responses API this maps to `previous_response_id` and allows multi-turn
+    * continuity without resending full message history.
+    */
    previousResponseId?: string;
 };
 
@@ -34,6 +44,11 @@ export const llmClient = {
       maxTokens = 300,
       previousResponseId,
    }: GenerateTextOptions): Promise<GenerateTextResult> {
+      // OpenAI Responses API:
+      // - `input` is the user prompt
+      // - `instructions` behaves like a system/developer message
+      // - `max_output_tokens` caps output length
+      // - `previous_response_id` links to the prior response for continuity
       const response = await openAIClient.responses.create({
          model,
          input: prompt,
@@ -43,6 +58,7 @@ export const llmClient = {
          previous_response_id: previousResponseId,
       });
 
+      // Normalize provider response to `{ id, text }` for callers.
       return {
          id: response.id,
          text: response.output_text,
@@ -50,6 +66,8 @@ export const llmClient = {
    },
 
    async summarizeReviews(reviews: string) {
+      // Uses a small local model via Ollama for cheap/fast summarization.
+      // `summarizePrompt` is the system instruction; `reviews` is user content.
       const response = await ollamaClient.chat({
          model: 'tinyllama',
          messages: [
