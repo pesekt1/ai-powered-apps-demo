@@ -25,7 +25,7 @@ export const reviewService = {
       // Cache-first: avoid calling the LLM if we already have a fresh summary in the database.
       const existingSummary = await reviewRepository.getReviewSummary(
          productId,
-         model
+         'openai'
       );
       if (existingSummary) {
          return existingSummary;
@@ -70,7 +70,7 @@ export const reviewService = {
       // Cache-first: avoid calling the LLM if we already have a fresh summary in the database.
       const existingSummary = await reviewRepository.getReviewSummary(
          productId,
-         model
+         'opensource'
       );
       if (existingSummary) {
          return existingSummary;
