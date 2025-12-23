@@ -20,27 +20,23 @@ To run the demo locally, follow these steps:
 Start Mysql server docker container:
 
 ```bash
-docker run -d --name ai-powered-apps-demo-mysql -p 3307:3306 -e MYSQL_ROOT_PASSWORD=123456 -h 127.0.0.1 -v ai_powered_apps_demo_mysql_data:/var/lib/mysql mysql:latest
+docker compose up -d
 ```
+
+## Server dependencies
+
+You need .env file in the packages/server folder with the following variables:
+
+```
+OPENAI_API_KEY=...
+DATABASE_URL=mysql://root:123456@localhost:3307/review_summarizer
+OLLAMA_HOST=http://127.0.0.1:11434
+```
+
+## Local development
 
 Install dependencies: in the root, client, and server folders, run:
 
 ```bash
 bun install
-```
-
-Start the application:
-In the root folder, run:
-
-```bash
-bun run dev
-```
-
-## Server dependencies
-
-You need .env file in the server folder with the following variables:
-
-```
-OPENAI_API_KEY=...
-DATABASE_URL=mysql://root:123456@localhost:3307/review_summarizer
 ```
