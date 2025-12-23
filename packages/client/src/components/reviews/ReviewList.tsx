@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { HiSparkles } from 'react-icons/hi2';
+import ReactMarkdown from 'react-markdown';
 import { Button } from '../ui/button';
 import ReviewSkeleton from './ReviewSkeleton';
 import StarRating from './StarRating';
@@ -58,7 +59,9 @@ const ReviewList = ({ productId }: Props) => {
       <div>
          <div className="mb-5">
             {currentSummary ? (
-               <p>{currentSummary}</p>
+               <div className="prose max-w-none">
+                  <ReactMarkdown>{currentSummary}</ReactMarkdown>
+               </div>
             ) : (
                <div>
                   <Button
