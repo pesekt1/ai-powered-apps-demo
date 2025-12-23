@@ -50,4 +50,35 @@ export const reviewService = {
 
       return summary;
    },
+
+   /**
+    * Produce a short summary for the given product’s reviews using the open-source model.
+    *
+    * Cache-first behavior:
+    * - Returns an existing non-expired summary when available.
+    * - Otherwise generates a new summary from recent reviews and stores it with a TTL.
+    *
+    * @param productId - Product primary key.
+    * @returns Summary text.
+    */
+   async summarizeReviewsOpensource(productId: number): Promise<string> {
+      // Cache-first: avoid calling the LLM if we already have a fresh summary in the database.
+      const existingSummary =
+         await reviewRepository.getReviewSummary(productId);
+      if (existingSummary) {
+         return existingSummary;
+      }
+
+      // Pull a bounded number of recent reviews to control cost/latency and context size.
+      const reviews = await reviewRepository.getReviews(productId, 10);
+      const joinedReviews = reviews.map((r) => r.content).join('\n\n');
+
+      // Call the open-source LLM to generate a new summary.
+      const summary = await llmClient.summarizeReviews(joinedReviews);
+
+      // Persist the generated summary in the database, so subsequent requests don’t re-call the LLM.
+      await reviewRepository.storeReviewSummary(productId, summary);
+
+      return summary;
+   },
 };
