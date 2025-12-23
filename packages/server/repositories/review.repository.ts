@@ -37,38 +37,50 @@ export const reviewRepository = {
     * @param productId - Product primary key.
     * @param summary - Generated summary text.
     */
-   storeReviewSummary(productId: number, summary: string) {
+   storeReviewSummary(productId: number, summary: string, model: string) {
       const now = new Date();
-      // TTL-based caching: summary is considered stale after 7 days.
       const expiresAt = dayjs().add(7, 'days').toDate();
-      const data = {
+
+      const createData = {
          content: summary,
          expiresAt,
          // Track when the summary was generated (useful for debugging/analytics).
          generatedAt: now,
          productId,
+         model,
       };
 
-      // Upsert ensures exactly one summary row per product (create if missing, update if present).
+      // Upsert ensures exactly one summary row per (productId, model).
+      // Requires schema: @@unique([productId, model]) on Summary.
       return prisma.summary.upsert({
-         where: { productId },
-         create: data,
-         update: data,
+         where: { productId_model: { productId, model } },
+         create: createData,
+         update: {
+            content: summary,
+            expiresAt,
+            generatedAt: now,
+            model, // ensure existing rows get normalized too
+         },
       });
    },
 
    /**
-    * Read the cached summary for a product if it is still fresh.
+    * Read the cached summary for a product+model if it is still fresh.
     *
-    * @param productId - Product primary key.
-    * @returns Summary text if a non-expired cached entry exists; otherwise `null`.
+    * NOTE: With `productId @unique` in the schema, there can only be one summary per product total,
+    * so writing a different `model` will overwrite the previous one.
     */
-   async getReviewSummary(productId: number): Promise<string | null> {
+   async getReviewSummary(
+      productId: number,
+      model: string
+   ): Promise<string | null> {
       const summary = await prisma.summary.findFirst({
          where: {
-            // Only return summaries that haven't expired (fresh cache entry).
-            AND: [{ productId }, { expiresAt: { gt: new Date() } }],
+            productId,
+            model,
+            expiresAt: { gt: new Date() },
          },
+         select: { content: true },
       });
 
       return summary ? summary.content : null;

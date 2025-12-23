@@ -21,9 +21,12 @@ export const reviewService = {
     * @returns Summary text.
     */
    async summarizeReviews(productId: number): Promise<string> {
+      const model = 'gpt-4.1';
       // Cache-first: avoid calling the LLM if we already have a fresh summary in the database.
-      const existingSummary =
-         await reviewRepository.getReviewSummary(productId);
+      const existingSummary = await reviewRepository.getReviewSummary(
+         productId,
+         model
+      );
       if (existingSummary) {
          return existingSummary;
       }
@@ -36,8 +39,9 @@ export const reviewService = {
       const prompt = templatePrompt.replace('{{reviews}}', joinedReviews);
 
       // Call the LLM to generate a new summary.
+
       const { text: summary } = await llmClient.generateText({
-         model: 'gpt-4.1',
+         model: model,
          prompt: prompt,
          // Lower temperature for more stable, less “creative” summaries.
          temperature: 0.2,
@@ -46,7 +50,7 @@ export const reviewService = {
       });
 
       // Persist the generated summary in the database, so subsequent requests don’t re-call the LLM.
-      await reviewRepository.storeReviewSummary(productId, summary);
+      await reviewRepository.storeReviewSummary(productId, summary, 'openai');
 
       return summary;
    },
@@ -62,9 +66,12 @@ export const reviewService = {
     * @returns Summary text.
     */
    async summarizeReviewsOpensource(productId: number): Promise<string> {
+      const model = 'tinyllama';
       // Cache-first: avoid calling the LLM if we already have a fresh summary in the database.
-      const existingSummary =
-         await reviewRepository.getReviewSummary(productId);
+      const existingSummary = await reviewRepository.getReviewSummary(
+         productId,
+         model
+      );
       if (existingSummary) {
          return existingSummary;
       }
@@ -74,10 +81,14 @@ export const reviewService = {
       const joinedReviews = reviews.map((r) => r.content).join('\n\n');
 
       // Call the open-source LLM to generate a new summary.
-      const summary = await llmClient.summarizeReviews(joinedReviews);
+      const summary = await llmClient.summarizeReviews(joinedReviews, model);
 
       // Persist the generated summary in the database, so subsequent requests don’t re-call the LLM.
-      await reviewRepository.storeReviewSummary(productId, summary);
+      await reviewRepository.storeReviewSummary(
+         productId,
+         summary,
+         'opensource'
+      );
 
       return summary;
    },

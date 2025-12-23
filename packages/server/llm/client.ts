@@ -65,11 +65,11 @@ export const llmClient = {
       };
    },
 
-   async summarizeReviews(reviews: string) {
+   async summarizeReviews(reviews: string, model: string) {
       // Uses a small local model via Ollama for cheap/fast summarization.
       // `summarizePrompt` is the system instruction; `reviews` is user content.
       const response = await ollamaClient.chat({
-         model: 'tinyllama',
+         model: model,
          messages: [
             {
                role: 'system',

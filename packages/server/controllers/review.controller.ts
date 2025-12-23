@@ -19,6 +19,7 @@ export const reviewController = {
     */
    async getReviews(req: Request, res: Response) {
       const productId = Number(req.params.id);
+      const model = req.query.model as 'openai' | 'opensource';
 
       // Validate path param early to avoid unnecessary DB work.
       if (isNaN(productId)) {
@@ -35,7 +36,7 @@ export const reviewController = {
 
       // This endpoint is read-only: return reviews plus any *cached* summary if available.
       const reviews = await reviewRepository.getReviews(productId);
-      const summary = await reviewRepository.getReviewSummary(productId);
+      const summary = await reviewRepository.getReviewSummary(productId, model);
 
       res.json({
          summary,
