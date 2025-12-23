@@ -55,7 +55,7 @@ export const reviewController = {
     */
    async summarizeReviews(req: Request, res: Response) {
       const productId = Number(req.params.id);
-      const model = req.query.model as 'openai' | 'opensource' | undefined;
+      const summaryKey = req.query.model as 'openai' | 'opensource' | undefined;
 
       // Validate path param early to avoid unnecessary DB/LLM work.
       if (isNaN(productId)) {
@@ -78,13 +78,11 @@ export const reviewController = {
       }
 
       // Service encapsulates cache lookup + LLM generation + persistence.
-      if (model === 'opensource') {
-         const summary =
-            await reviewService.summarizeReviewsOpensource(productId);
-         res.json({ summary });
-      } else {
-         const summary = await reviewService.summarizeReviews(productId);
-         res.json({ summary });
-      }
+
+      const summary = await reviewService.summarizeReviews(
+         productId,
+         summaryKey || 'openai'
+      );
+      res.json({ summary });
    },
 };

@@ -18,14 +18,17 @@ export const reviewService = {
     * - Otherwise generates a new summary from recent reviews and stores it with a TTL.
     *
     * @param productId - Product primary key.
+    * @param summaryKey - Summary model key ('openai' or 'opensource').
     * @returns Summary text.
     */
-   async summarizeReviews(productId: number): Promise<string> {
-      const model = 'gpt-4.1';
+   async summarizeReviews(
+      productId: number,
+      summaryKey: string
+   ): Promise<string> {
       // Cache-first: avoid calling the LLM if we already have a fresh summary in the database.
       const existingSummary = await reviewRepository.getReviewSummary(
          productId,
-         'openai'
+         summaryKey
       );
       if (existingSummary) {
          return existingSummary;
@@ -35,61 +38,38 @@ export const reviewService = {
       const reviews = await reviewRepository.getReviews(productId, 10);
       const joinedReviews = reviews.map((r) => r.content).join('\n\n');
 
-      // Add the reviews string into the prompt template.
+      // Generate a new summary via the LLM client based on the specified model key.
+      const summary = await this.getSummary(joinedReviews, summaryKey);
+
+      // Persist the generated summary in the database, so subsequent requests don’t re-call the LLM.
+      await reviewRepository.storeReviewSummary(productId, summary, summaryKey);
+
+      return summary;
+   },
+   /**
+    *
+    * Generate a summary for the given joined reviews string using the specified model key.
+    * @param joinedReviews
+    * @param summaryKey
+    * @returns
+    */
+   async getSummary(
+      joinedReviews: string,
+      summaryKey: string
+   ): Promise<string> {
+      if (summaryKey === 'opensource')
+         return await llmClient.summarizeReviews(joinedReviews, 'tinyllama');
+
+      // else default to OpenAI summarization.
       const prompt = templatePrompt.replace('{{reviews}}', joinedReviews);
-
-      // Call the LLM to generate a new summary.
-
       const { text: summary } = await llmClient.generateText({
-         model: model,
+         model: 'gpt-4.1',
          prompt: prompt,
          // Lower temperature for more stable, less “creative” summaries.
          temperature: 0.2,
          // Hard cap to prevent unexpectedly large responses.
          maxTokens: 500,
       });
-
-      // Persist the generated summary in the database, so subsequent requests don’t re-call the LLM.
-      await reviewRepository.storeReviewSummary(productId, summary, 'openai');
-
-      return summary;
-   },
-
-   /**
-    * Produce a short summary for the given product’s reviews using the open-source model.
-    *
-    * Cache-first behavior:
-    * - Returns an existing non-expired summary when available.
-    * - Otherwise generates a new summary from recent reviews and stores it with a TTL.
-    *
-    * @param productId - Product primary key.
-    * @returns Summary text.
-    */
-   async summarizeReviewsOpensource(productId: number): Promise<string> {
-      const model = 'tinyllama';
-      // Cache-first: avoid calling the LLM if we already have a fresh summary in the database.
-      const existingSummary = await reviewRepository.getReviewSummary(
-         productId,
-         'opensource'
-      );
-      if (existingSummary) {
-         return existingSummary;
-      }
-
-      // Pull a bounded number of recent reviews to control cost/latency and context size.
-      const reviews = await reviewRepository.getReviews(productId, 10);
-      const joinedReviews = reviews.map((r) => r.content).join('\n\n');
-
-      // Call the open-source LLM to generate a new summary.
-      const summary = await llmClient.summarizeReviews(joinedReviews, model);
-
-      // Persist the generated summary in the database, so subsequent requests don’t re-call the LLM.
-      await reviewRepository.storeReviewSummary(
-         productId,
-         summary,
-         'opensource'
-      );
-
       return summary;
    },
 };
