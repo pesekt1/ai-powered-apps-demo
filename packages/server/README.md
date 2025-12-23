@@ -21,8 +21,9 @@ bunx prisma generate
 Add the .env:
 
 ```env
-OPENAI_API_KEY=your_openai_api_key
-DATABASE_URL=your_database_url
+OPENAI_API_KEY=...
+DATABASE_URL=mysql://root:123456@localhost:3307/review_summarizer
+OLLAMA_HOST=http://127.0.0.1:11434
 ```
 
 This project was created using `bun init` in bun v1.3.5. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
