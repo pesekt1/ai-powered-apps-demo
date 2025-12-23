@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { HiSparkles } from 'react-icons/hi2';
 import { Button } from '../ui/button';
 import ReviewSkeleton from './ReviewSkeleton';
@@ -14,8 +14,16 @@ type Props = {
 };
 
 const ReviewList = ({ productId }: Props) => {
+   const queryClient = useQueryClient();
+
    const summaryMutation = useMutation<SummarizeResponse>({
       mutationFn: () => reviewsApi.summarizeReviews(productId),
+      onSuccess: (data) => {
+         queryClient.setQueryData<GetReviewsResponse>(
+            ['reviews', productId],
+            (old) => (old ? { ...old, summary: data.summary } : old)
+         );
+      },
    });
 
    const reviewsQuery = useQuery<GetReviewsResponse>({
