@@ -22,6 +22,7 @@ const ProductsGrid = () => {
 
    return (
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+         <h1 className="col-span-full text-2xl font-bold mb-4">Our Products</h1>
          {products.map((p) => (
             <ProductCard key={p.id} product={p} />
          ))}
