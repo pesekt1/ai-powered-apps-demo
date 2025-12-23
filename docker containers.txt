@@ -1,0 +1,15 @@
+-----------------------------------------------------------
+MySQL Server Container:
+docker run -d --name ai-powered-apps-demo-mysql -p 3307:3306 -e MYSQL_ROOT_PASSWORD=123456 -h 127.0.0.1 -v ai_powered_apps_demo_mysql_data:/var/lib/mysql mysql:latest
+
+
+----------------------------------------------------------
+Ollama Container:
+docker run -d --name ollama -p 11434:11434 -v ollama:/root/.ollama ollama/ollama
+
+Pull the model inside the container:
+docker exec -it ollama ollama pull tinyllama
+
+Verify from host:
+curl http://127.0.0.1:11434/api/tags
+-----------------------------------------------------------

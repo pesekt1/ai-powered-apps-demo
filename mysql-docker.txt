@@ -1,1 +1,0 @@
-docker run -d --name ai-powered-apps-demo-mysql -p 3307:3306 -e MYSQL_ROOT_PASSWORD=123456 -h 127.0.0.1 -v ai_powered_apps_demo_mysql_data:/var/lib/mysql mysql:latest
