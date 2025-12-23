@@ -33,7 +33,19 @@ function App() {
          </div>
 
          <div className="flex-1 min-h-0">
-            {view === 'products' ? <ProductsGrid /> : <ChatBot />}
+            <div
+               className={view === 'products' ? 'h-full' : 'hidden'}
+               aria-hidden={view !== 'products'}
+            >
+               <ProductsGrid />
+            </div>
+
+            <div
+               className={view === 'chat' ? 'h-full' : 'hidden'}
+               aria-hidden={view !== 'chat'}
+            >
+               <ChatBot />
+            </div>
          </div>
       </div>
    );
