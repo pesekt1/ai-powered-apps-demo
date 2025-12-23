@@ -1,7 +1,7 @@
 import { InferenceClient } from '@huggingface/inference';
 import { Ollama } from 'ollama';
 import OpenAI from 'openai';
-import summarizePrompt from '../llm/prompts/summarize-reviews.txt';
+import summarizePrompt from '../llm/prompts/summarize-reviews-ollama.txt';
 
 // OpenAI client used for the main "generateText" path (Responses API).
 // Requires OPENAI_API_KEY in the environment.
