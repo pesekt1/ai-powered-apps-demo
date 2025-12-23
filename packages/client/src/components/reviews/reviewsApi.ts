@@ -24,9 +24,9 @@ export type SummarizeResponse = {
 };
 
 export const reviewsApi = {
-   async fetchReviews(productId: number) {
+   async fetchReviews(productId: number, model: 'openai' | 'opensource') {
       const res = await api.get<GetReviewsResponse>(
-         `/api/products/${productId}/reviews`
+         `/api/products/${productId}/reviews?model=${model}`
       );
       return res.data;
    },

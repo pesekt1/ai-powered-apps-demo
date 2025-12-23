@@ -30,7 +30,7 @@ const ReviewList = ({ productId, model }: Props) => {
 
    const reviewsQuery = useQuery<GetReviewsResponse>({
       queryKey: ['reviews', productId, model],
-      queryFn: () => reviewsApi.fetchReviews(productId),
+      queryFn: () => reviewsApi.fetchReviews(productId, model),
    });
 
    if (reviewsQuery.isLoading) {
