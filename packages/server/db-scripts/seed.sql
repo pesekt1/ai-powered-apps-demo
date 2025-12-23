@@ -1,3 +1,37 @@
+-- Ensure DB exists and is selected (safe during init)
+CREATE DATABASE IF NOT EXISTS review_summarizer;
+USE review_summarizer;
+-- Minimal schema to support the seed inserts (matches Prisma @@map table names)
+CREATE TABLE IF NOT EXISTS `products` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `description` TEXT NULL,
+  `price` DOUBLE NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+CREATE TABLE IF NOT EXISTS `reviews` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `author` VARCHAR(255) NOT NULL,
+  `rating` TINYINT NOT NULL,
+  `content` TEXT NOT NULL,
+  `createdAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `productId` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `reviews_productId_idx` (`productId`),
+  CONSTRAINT `reviews_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `products` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+CREATE TABLE IF NOT EXISTS `summaries` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `productId` INT NOT NULL,
+  `model` VARCHAR(100) NOT NULL,
+  `content` TEXT NOT NULL,
+  `generatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `expiresAt` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `productId_model` (`productId`, `model`),
+  KEY `summaries_expiresAt_idx` (`expiresAt`),
+  CONSTRAINT `summaries_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `products` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 INSERT INTO products (id, name, description, price)
 VALUES (
     1,

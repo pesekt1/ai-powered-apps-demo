@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-   baseURL: 'http://localhost:3000',
+   // If empty, axios uses current origin (works with Vite proxy on /api)
+   baseURL: import.meta.env.VITE_API_BASE_URL ?? '',
 });
 
 export type Product = {

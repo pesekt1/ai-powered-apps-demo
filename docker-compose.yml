@@ -1,0 +1,112 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: ai-powered-apps-demo-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_DATABASE: "review_summarizer"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Runs only on first init (when mysql_data is empty)
+      - ./packages/server/db-scripts/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p123456"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  # One-shot init container: pulls model into the shared ollama_data volume.
+  # Safe to run on every `docker compose up` (pull is cached if already present).
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: ollama-pull
+    depends_on:
+      ollama:
+        condition: service_started
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_MODEL: tinyllama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: "no"
+    entrypoint:
+      [
+        "/bin/sh",
+        "-lc",
+        "i=0; until ollama list >/dev/null 2>&1; do i=$$((i+1)); [ $$i -gt 120 ] && echo 'Ollama not ready' && exit 1; sleep 1; done; MODEL=$$(printf '%s' \"$$OLLAMA_MODEL\" | tr -d '\\r\\n'); echo \"Pulling: $$MODEL\"; ollama pull \"$$MODEL\""
+      ]
+
+  server:
+    build:
+      context: ./packages/server
+      dockerfile: Dockerfile
+    container_name: ai-powered-apps-demo-server
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./packages/server/.env
+    environment:
+      NODE_ENV: development
+      # file watching reliability in containers
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      # Override .env for in-container connectivity (localhost inside container != host)
+      DATABASE_URL: mysql://root:123456@mysql:3306/review_summarizer
+      # Prefer providing this from your host environment/CI rather than committing it
+      OLLAMA_HOST: http://ollama:11434
+      # (optional) keep if other code uses it; client.ts now supports both
+      OLLAMA_BASE_URL: http://ollama:11434
+    volumes:
+      - ./packages/server:/app
+      # Keep deps inside the container. The bind mount would otherwise mask /app/node_modules.
+      - server_node_modules:/app/node_modules
+    depends_on:
+      mysql:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+      ollama-pull:
+        condition: service_completed_successfully
+    command: /bin/sh -lc "bun install && bun run dev"
+
+  client:
+    build:
+      context: ./packages/client
+      dockerfile: Dockerfile
+    container_name: ai-powered-apps-demo-client
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      # if your client needs to know the server URL at dev time, set it here (adjust key)
+      VITE_API_BASE_URL: http://localhost:3000
+      VITE_API_PROXY_TARGET: http://server:3000
+    volumes:
+      - ./packages/client:/app
+      # Same idea for the Vite app: deps live in the container volume, not on the host bind mount.
+      - client_node_modules:/app/node_modules
+    # Vite needs --host 0.0.0.0 to be reachable from outside the container
+    command: /bin/sh -lc "bun install && bun run dev -- --host 0.0.0.0 --port 5173"
+    depends_on:
+      server:
+        condition: service_started
+
+volumes:
+  mysql_data:
+  ollama_data:
+  server_node_modules:
+  client_node_modules:

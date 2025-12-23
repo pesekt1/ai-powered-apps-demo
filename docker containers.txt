@@ -1,4 +1,49 @@
 -----------------------------------------------------------
+DEV (docker-compose) - server + client + mysql + ollama
+
+Ollama connectivity:
+- Server running on HOST uses:     OLLAMA_HOST=http://127.0.0.1:11434
+- Server running in Docker uses:   OLLAMA_HOST=http://ollama:11434
+  (docker-compose sets this env var)
+
+DB connection notes:
+- From your HOST machine (e.g. running server without Docker):
+  mysql://root:123456@localhost:3307/review_summarizer
+- From INSIDE the server container (Docker network):
+  mysql://root:123456@mysql:3306/review_summarizer
+  (docker-compose overrides DATABASE_URL accordingly)
+
+Prereqs (in your repos):
+- server uses Bun:
+  "dev": "bun --watch run index.ts"
+- client uses Bun to run Vite:
+  "dev": "vite"   (run via: bun run dev)
+
+Ports (defaults in docker-compose.yml; change if needed):
+- Client: http://localhost:5173
+- Server: http://localhost:3000
+- MySQL:  localhost:3307 -> container 3306
+- Ollama: http://localhost:11434
+
+Run:
+- docker compose up --build
+
+Stop:
+- docker compose down
+
+Reset DB (DANGEROUS: deletes all MySQL data):
+- docker compose down -v
+
+Ollama model:
+- On first `docker compose up`, the `ollama-pull` service auto-runs:
+  it pulls `tinyllama` into the shared ollama volume.
+- Re-running compose is fine; the pull is cached if already present.
+
+Verify Ollama from host:
+- curl http://127.0.0.1:11434/api/tags
+-----------------------------------------------------------
+
+LEGACY (manual docker run) - not used when running docker compose:
 MySQL Server Container:
 docker run -d --name ai-powered-apps-demo-mysql -p 3307:3306 -e MYSQL_ROOT_PASSWORD=123456 -h 127.0.0.1 -v ai_powered_apps_demo_mysql_data:/var/lib/mysql mysql:latest
 
@@ -13,3 +58,12 @@ docker exec -it ollama ollama pull tinyllama
 Verify from host:
 curl http://127.0.0.1:11434/api/tags
 -----------------------------------------------------------
+
+Deps note (client/server):
+- Containers use a named volume mounted at /app/node_modules.
+- If you change package.json, the existing node_modules volume may be out of date.
+- Options:
+  1) (Recommended) compose runs `bun install` on container startup (so it self-heals)
+  2) or run manually: docker compose exec client bun install
+     (same for server)
+  3) or reset volumes: docker compose down -v

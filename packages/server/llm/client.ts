@@ -14,7 +14,14 @@ const openAIClient = new OpenAI({
 const inferenceClient = new InferenceClient(process.env.HF_TOKEN);
 
 // Ollama client used for local/offline model calls (e.g., quick summaries).
-const ollamaClient = new Ollama();
+// In Docker: set OLLAMA_HOST=http://ollama:11434
+// On host:  set OLLAMA_HOST=http://127.0.0.1:11434 (default fallback below)
+const ollamaClient = new Ollama({
+   host:
+      process.env.OLLAMA_HOST ??
+      process.env.OLLAMA_BASE_URL ??
+      'http://127.0.0.1:11434',
+});
 
 type GenerateTextOptions = {
    model?: string;
