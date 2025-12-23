@@ -12,23 +12,24 @@ import {
 
 type Props = {
    productId: number;
+   model: 'openai' | 'opensource';
 };
 
-const ReviewList = ({ productId }: Props) => {
+const ReviewList = ({ productId, model }: Props) => {
    const queryClient = useQueryClient();
 
    const summaryMutation = useMutation<SummarizeResponse>({
-      mutationFn: () => reviewsApi.summarizeReviews(productId),
+      mutationFn: () => reviewsApi.summarizeReviews(productId, model),
       onSuccess: (data) => {
          queryClient.setQueryData<GetReviewsResponse>(
-            ['reviews', productId],
+            ['reviews', productId, model],
             (old) => (old ? { ...old, summary: data.summary } : old)
          );
       },
    });
 
    const reviewsQuery = useQuery<GetReviewsResponse>({
-      queryKey: ['reviews', productId],
+      queryKey: ['reviews', productId, model],
       queryFn: () => reviewsApi.fetchReviews(productId),
    });
 

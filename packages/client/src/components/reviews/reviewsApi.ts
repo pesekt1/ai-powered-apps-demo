@@ -31,9 +31,9 @@ export const reviewsApi = {
       return res.data;
    },
 
-   async summarizeReviews(productId: number) {
+   async summarizeReviews(productId: number, model: 'openai' | 'opensource') {
       const res = await api.post<SummarizeResponse>(
-         `/api/products/${productId}/reviews/summarize`
+         `/api/products/${productId}/reviews/summarize?model=${model}`
       );
       return res.data;
    },
