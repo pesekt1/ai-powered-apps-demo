@@ -1,0 +1,58 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.15 Chrome/134.0.6998.205 Electron/35.2.1 Safari/537.36" version="26.2.15">
+  <diagram name="Docker Compose Architecture" id="cESPpLkJ7BnZbfA8Sre6">
+    <mxGraphModel dx="1106" dy="1784" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="IRhAjZOSahO7sg9bzffH-1" value="" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="530" y="-10" width="553.34" height="390" as="geometry" />
+        </mxCell>
+        <mxCell id="IRhAjZOSahO7sg9bzffH-2" value="Client (Vite + Bun)&#xa;Port 5173" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="IRhAjZOSahO7sg9bzffH-1" vertex="1">
+          <mxGeometry x="132.97" y="40" width="107.03" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="IRhAjZOSahO7sg9bzffH-3" value="Server API (Bun)&#xa;Port 3000" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="IRhAjZOSahO7sg9bzffH-1" vertex="1">
+          <mxGeometry x="290.1098901098901" y="37.49890909090909" width="125.71428571428572" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="IRhAjZOSahO7sg9bzffH-4" value="MySQL 8.4&#xa;Port 3306&#xa;Volume: mysql_data&#xa;Init: seed.sql" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="IRhAjZOSahO7sg9bzffH-1" vertex="1">
+          <mxGeometry x="90" y="180" width="204.95" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="IRhAjZOSahO7sg9bzffH-5" value="&#xa;Ollama&#xa;Port 11434&#xa;Volume: ollama_data" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="IRhAjZOSahO7sg9bzffH-1" vertex="1">
+          <mxGeometry x="333.63" y="180" width="156.37" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="IRhAjZOSahO7sg9bzffH-6" value="Ollama-Pull (Init Container)&#xa;Pulls model to ollama_data" style="rounded=1;fillColor=#fdebd0;strokeColor=#d79b00;" parent="IRhAjZOSahO7sg9bzffH-1" vertex="1">
+          <mxGeometry x="330.4432967032967" y="290.00272727272727" width="159.56043956043956" height="67.49836363636364" as="geometry" />
+        </mxCell>
+        <mxCell id="IRhAjZOSahO7sg9bzffH-8" style="endArrow=block;" parent="IRhAjZOSahO7sg9bzffH-1" source="IRhAjZOSahO7sg9bzffH-2" target="IRhAjZOSahO7sg9bzffH-3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IRhAjZOSahO7sg9bzffH-9" style="endArrow=block;" parent="IRhAjZOSahO7sg9bzffH-1" source="IRhAjZOSahO7sg9bzffH-3" target="IRhAjZOSahO7sg9bzffH-4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IRhAjZOSahO7sg9bzffH-10" style="endArrow=block;" parent="IRhAjZOSahO7sg9bzffH-1" source="IRhAjZOSahO7sg9bzffH-3" target="IRhAjZOSahO7sg9bzffH-5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IRhAjZOSahO7sg9bzffH-12" style="endArrow=block;dashed=1;" parent="IRhAjZOSahO7sg9bzffH-1" source="IRhAjZOSahO7sg9bzffH-6" target="IRhAjZOSahO7sg9bzffH-5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WAuHo-VFjo2O3HSVyBVm-1" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Database-mysql.svg/1448px-Database-mysql.svg.png;" vertex="1" parent="IRhAjZOSahO7sg9bzffH-1">
+          <mxGeometry x="90" y="189.14" width="50.75" height="71.73" as="geometry" />
+        </mxCell>
+        <mxCell id="WAuHo-VFjo2O3HSVyBVm-6" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/ollama.png;" vertex="1" parent="IRhAjZOSahO7sg9bzffH-1">
+          <mxGeometry x="436.66" y="180" width="53.34" height="53.34" as="geometry" />
+        </mxCell>
+        <mxCell id="IRhAjZOSahO7sg9bzffH-7" value="OpenAI API&#xa;(api.openai.com)" style="rounded=1;fillColor=#eeeeee;strokeColor=#999999;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="1110" y="40" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="IRhAjZOSahO7sg9bzffH-11" style="endArrow=block;dashed=1;" parent="1" source="IRhAjZOSahO7sg9bzffH-3" target="IRhAjZOSahO7sg9bzffH-7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WAuHo-VFjo2O3HSVyBVm-3" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://www.svgrepo.com/show/306500/openai.svg;" vertex="1" parent="1">
+          <mxGeometry x="1145" y="-10" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WAuHo-VFjo2O3HSVyBVm-8" value="&lt;div&gt;&lt;font style=&quot;font-size: 36px;&quot;&gt;Development environment&lt;/font&gt;&lt;/div&gt;&lt;font style=&quot;font-size: 36px;&quot;&gt;docker-compose configuration&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="490" y="-130" width="700" height="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
