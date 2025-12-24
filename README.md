@@ -40,3 +40,12 @@ Install dependencies: in the root, client, and server folders, run:
 ```bash
 bun install
 ```
+
+## Diagrams
+
+![Docker Compose architecture](./docs/diagrams/docker-compose.svg)
+
+The editable sources are in this repo:
+
+- System architecture: [`architecture.drawio`](./architecture.drawio)
+- Docker Compose architecture: [`docker-compose.drawio`](./docker-compose.drawio)
