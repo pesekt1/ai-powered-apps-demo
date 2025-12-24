@@ -5,13 +5,14 @@
    "private": true,
    "scripts": {
       "start": "bun run index.ts",
-      "dev": "bun --watch run index.ts",
+      "dev": "nodemon --legacy-watch --watch . --ext ts --exec \"bun index.ts\"",
       "postinstall": "prisma generate --schema ./prisma/schema.prisma"
    },
    "devDependencies": {
       "@types/bun": "latest",
       "@types/cors": "^2.8.19",
       "@types/express": "^5.0.3",
+      "nodemon": "^3.1.11",
       "prisma": "^6.13.0"
    },
    "peerDependencies": {

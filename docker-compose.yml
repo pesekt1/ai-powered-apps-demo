@@ -50,6 +50,7 @@ services:
     build:
       context: ./packages/server
       dockerfile: Dockerfile
+    # NOTE: server image Bun version must support the repo's bun.lock format (lockfileVersion: 1).
     container_name: ai-powered-apps-demo-server
     working_dir: /app
     ports:
@@ -59,8 +60,7 @@ services:
     environment:
       NODE_ENV: development
       # file watching reliability in containers
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
+      BUN_WATCH_POLLING: true
       # Override .env for in-container connectivity (localhost inside container != host)
       DATABASE_URL: mysql://root:123456@mysql:3306/review_summarizer
       # Prefer providing this from your host environment/CI rather than committing it
@@ -78,7 +78,7 @@ services:
         condition: service_started
       ollama-pull:
         condition: service_completed_successfully
-    command: /bin/sh -lc "bun install && bun run dev"
+    command: bun run dev
 
   client:
     build:

@@ -7,7 +7,8 @@ COPY package.json ./
 COPY bun.lockb* ./
 RUN bun install --frozen-lockfile
 
-COPY . .
+# for non-bind-mount usage; bind mount will override at runtime
+# COPY . .
 
 EXPOSE 5173
 
