@@ -43,9 +43,9 @@ bun install
 
 ## Diagrams
 
-![Docker Compose architecture](./docs/diagrams/docker-compose.drawio.svg)
+![Docker Compose architecture](./docs/docker-compose.drawio.svg)
 
 The editable sources are in this repo:
 
-- System architecture: [`architecture.drawio`](./architecture.drawio)
-- Docker Compose architecture: [`docker-compose.drawio`](./docker-compose.drawio)
+- System architecture: [`architecture.drawio`](./docs/architecture.drawio)
+- Docker Compose architecture: [`docker-compose.drawio`](./docs/docker-compose.drawio)
