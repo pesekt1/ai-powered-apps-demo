@@ -43,7 +43,7 @@ bun install
 
 ## Diagrams
 
-![Docker Compose architecture](./docs/diagrams/docker-compose.svg)
+![Docker Compose architecture](./docs/diagrams/docker-compose.drawio.svg)
 
 The editable sources are in this repo:
 
